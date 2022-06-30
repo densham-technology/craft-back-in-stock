@@ -1,0 +1,48 @@
+{
+    "name": "densham-technology/craft-back-in-stock",
+    "description": "Plugin giving customers the ability to add their email to a list which will allow them to be notified when a product that is out of stock is restocked.",
+    "type": "craft-plugin",
+    "version": "0.1.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "craft-back-in-stock"
+    ],
+    "support": {
+        "issues": "https://github.com/densham-technology/craft-back-in-stock/issues"
+    },
+    "license": "Commercial",
+    "authors": [
+        {
+            "name": "Tom Densham",
+            "homepage": "https://github.com/densham-technology"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "require-dev": {
+      "craftcms/cms": "^3.2.0",
+      "codeception/codeception": "^3.0",
+      "vlucas/phpdotenv": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "denshamtechnology\\backinstock\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Back in stock",
+        "handle": "back-in-stock",
+        "developer": "Tom Densham",
+        "developerUrl": "https://github.com/densham-technology",
+        "documentationUrl": "???",
+        "changelogUrl": "???",
+        "components": {
+            "subscriptions": "denshamtechnology\\backinstock\\services\\Subscriptions"
+        },
+        "class": "denshamtechnology\\backinstock\\BackInStock"
+    }
+}

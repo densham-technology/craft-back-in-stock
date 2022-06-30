@@ -1,0 +1,37 @@
+<table>
+    <tr>
+        <th>Customer</th>
+        <th>Product</th>
+        <th>Stock</th>
+        <th>Request date</th>
+        <th>Request amount</th>
+    </tr>
+    {% for subscription in subscriptions %}
+        <tr>
+            <td>
+                <a href="{{ subscription.user.cpEditUrl() }}">{{ subscription.user.fullName }}</a>
+            </td>
+            <td>
+                <a href="{{ subscription.variant.getCpEditUrl() }}">{{ subscription.variant.title }}</a>
+                ({{ subscription.variant.sku }})
+            </td>
+            <td>{{ subscription.variant.stock }}</td>
+            <td>{{ subscription.dateCreated|datetime }}</td>
+            <td>10</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<div id="foo"></div>
+{% set elementType = 'craft\\commerce\\elements\\Order' %}
+{% set elementInstance = craft.app.elements.createElement(elementType) %}
+{% set context = 'index' %}
+{% block initJs %}
+    Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#foo'), {
+    elementTypeName: '{{ elementInstance.displayName()|e("js") }}',
+    elementTypePluralName: '{{ elementInstance.pluralDisplayName()|e("js") }}',
+    context: '{{ context }}',
+    storageKey: 'elementindex.{{ elementType|e("js") }}',
+    toolbarSelector: '#toolbar'
+    });
+{% endblock %}
