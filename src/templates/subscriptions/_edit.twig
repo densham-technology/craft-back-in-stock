@@ -1,0 +1,51 @@
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Edit Subscription'|t('back-in-stock') %}
+{% set fullPageForm = true %}
+
+{% set crumbs = [
+    { label: 'Subscriptions'|t('back-in-stock'), url: url('back-in-stock') }
+] %}
+
+{% block content %}
+    <input type="hidden" name="subscriptionId" value="{{ subscription.id }}">
+
+    {# Have the form submit to a back-in-stock/subscriptions/save controller action #}
+    {{ actionInput('back-in-stock/subscriptions/save') }}
+
+    {# Have the save action redirect to /back-in-stock afterward #}
+    {{ redirectInput('back-in-stock') }}
+
+    {{ forms.elementSelectField({
+        label: 'Customer'|t('back-in-stock'),
+        id: 'user',
+        name: 'user',
+        elementType: 'craft\\elements\\User',
+        selectionLabel: 'Choose'|t('back-in-stock'),
+        limit: 1,
+        elements: (user is defined and user ? [user]),
+        required: true,
+    }) }}
+
+    {{ forms.elementSelectField({
+        label: 'Product'|t('back-in-stock'),
+        id: 'variant',
+        name: 'variant',
+        elementType: 'craft\\commerce\\elements\\Variant',
+        selectionLabel: 'Choose'|t('back-in-stock'),
+        limit: 1,
+        elements: (variant is defined and variant ? [variant]),
+        required: true,
+    }) }}
+
+    {{ forms.textField({
+        label: 'Quantity'|t('back-in-stock'),
+        instructions: 'Enter quantity requested'|t('back-in-stock'),
+        id: '`amount`',
+        name: 'amount',
+        value: subscription.amount,
+        required: true,
+        errors: subscription.getErrors('amount'),
+    }) }}
+{% endblock %}

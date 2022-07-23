@@ -14,8 +14,10 @@ use craft\commerce\elements\db\VariantQuery;
 use craft\commerce\elements\Variant;
 use craft\events\DefineBehaviorsEvent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\services\Elements;
 use craft\services\Fields;
+use craft\web\UrlManager;
 use denshamtechnology\backinstock\behaviors\BackInStockVariantBehaviour;
 use denshamtechnology\backinstock\behaviors\BackInStockVariantQueryBehaviour;
 use denshamtechnology\backinstock\elements\Subscription;
@@ -108,6 +110,16 @@ class BackInStock extends Plugin
         );
 
         Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            function (RegisterUrlRulesEvent $event) {
+                $event->rules['back-in-stock'] = 'back-in-stock/subscriptions/index';
+                $event->rules['back-in-stock/subscriptions/new'] = 'back-in-stock/subscriptions/edit';
+                $event->rules['back-in-stock/subscriptions/<subscriptionId:\d+>'] = 'back-in-stock/subscriptions/edit';
+            }
+        );
+
+        Event::on(
             Variant::class,
             Variant::EVENT_DEFINE_BEHAVIORS,
             function (DefineBehaviorsEvent $event) {
@@ -168,16 +180,6 @@ class BackInStock extends Plugin
         );
     }
 
-    public function getCpNavItem()
-    {
-        $item = parent::getCpNavItem();
-        $item['subnav'] = [
-            'products' => ['label' => 'Products', 'url' => 'back-in-stock/products'],
-        ];
-        return $item;
-    }
-
     // Protected Methods
     // =========================================================================
-
 }

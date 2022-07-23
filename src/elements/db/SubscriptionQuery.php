@@ -21,7 +21,10 @@ class SubscriptionQuery extends ElementQuery
 
         // select the amount and currency columns
         $this->query->select([
+            'backinstock_subscriptions.userId',
+            'backinstock_subscriptions.variantId',
             'backinstock_subscriptions.amount',
+            'backinstock_subscriptions.dateCreated',
         ]);
 
         if ($this->amount) {
