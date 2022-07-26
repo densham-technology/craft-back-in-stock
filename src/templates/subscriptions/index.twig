@@ -1,0 +1,24 @@
+{% extends '_layouts/elementindex' %}
+
+{% set selectedSubnavItem = 'subscriptions' %}
+{% set title = 'Subscriptions' %}
+{% set elementType = 'denshamtechnology\\backinstock\\elements\\Subscription' %}
+
+{% block toolbar %}
+    {% include '_elements/toolbar' with {
+        showSiteMenu: false,
+    } %}
+    <a class="btn submit icon add" href="{{ cpUrl('back-in-stock/subscriptions/new') }}">{{ "New subscription"|t('back-in-stock') }}</a>
+{% endblock %}
+
+{% block initJs %}
+    Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#page-container'), {
+    elementTypeName: '{{ elementInstance.displayName()|e("js") }}',
+    elementTypePluralName: '{{ elementInstance.pluralDisplayName()|e("js") }}',
+    context: '{{ context }}',
+    storageKey: 'elementindex.{{ elementType|e("js") }}',
+    criteria: {{ criteria }},
+    toolbarSelector: '#toolbar',
+    canHaveDrafts: {{ (canHaveDrafts ?? false) ? 'true' : 'false' }},
+    });
+{% endblock %}

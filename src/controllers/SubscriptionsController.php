@@ -9,9 +9,11 @@ use yii\web\Response;
 
 class SubscriptionsController extends Controller
 {
-    public function actionIndex(): Response
+    public function actionIndex(int $variantId = null): Response
     {
-        return $this->renderTemplate('back-in-stock/subscriptions/_index');
+        return $this->renderTemplate('back-in-stock/subscriptions/index', [
+            'criteria' => $variantId ? "{variantId:$variantId}" : '[]',
+        ]);
     }
 
     public function actionEdit(

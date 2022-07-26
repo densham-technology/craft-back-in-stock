@@ -215,6 +215,19 @@ class Subscription extends Element
         parent::afterSave($isNew);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getSearchKeywords(string $attribute): string
+    {
+        switch ($attribute) {
+            case 'variant':
+                return $this->getVariant()->title;
+            default:
+                return '';
+        }
+    }
+
     protected static function defineSources(string $context = null): array
     {
         return [
@@ -249,6 +262,14 @@ class Subscription extends Element
                 'defaultDir' => 'desc',
             ],
         ];
+    }
+
+    /**
+     * @return string[]
+     */
+    protected static function defineSearchableAttributes(): array
+    {
+        return ['variant'];
     }
 
     /**

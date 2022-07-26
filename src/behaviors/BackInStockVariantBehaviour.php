@@ -1,7 +1,7 @@
 <?php namespace denshamtechnology\backinstock\behaviors;
 
 use craft\commerce\elements\Variant;
-use denshamtechnology\backinstock\records\Subscription;
+use denshamtechnology\backinstock\elements\Subscription;
 use yii\base\Behavior;
 
 class BackInStockVariantBehaviour extends Behavior

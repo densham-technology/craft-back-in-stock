@@ -14,6 +14,8 @@ class BackInStockVariantQueryBehaviour extends Behavior
      */
     public $hasBackInStockSubscription;
 
+    public $distinct;
+
     /**
      * Narrows the query results to only variants that are on sale.
      *
@@ -33,6 +35,12 @@ class BackInStockVariantQueryBehaviour extends Behavior
         return $this;
     }
 
+    public function distinct(bool $value = true)
+    {
+        $this->distinct = $value;
+        return $this;
+    }
+
     public function events()
     {
         return [
@@ -49,6 +57,10 @@ class BackInStockVariantQueryBehaviour extends Behavior
             } else {
                 //
             }
+        }
+
+        if ($this->distinct) {
+            $this->owner->subQuery->distinct();
         }
     }
 }

@@ -14,12 +14,7 @@ namespace denshamtechnology\backinstock\services;
 use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Variant;
-use craft\commerce\Plugin as Commerce;
-use craft\commerce\records\Product;
-use craft\elements\User;
 use denshamtechnology\backinstock\elements\Subscription as SubscriptionElement;
-use denshamtechnology\backinstock\models\Subscription;
-use denshamtechnology\backinstock\records\Subscription as SubscriptionRecord;
 
 /**
  * CraftbackinstockService Service
@@ -52,22 +47,29 @@ class Subscriptions extends Component
     public function getSubscriptionsForProduct($id)
     {
         $results = SubscriptionElement::find()
-                                     ->where(['in', 'variantId', Variant::find()->where(['productId' => $id])->select(['commerce_variants.id'])])
+                                     ->where([
+                                         'in',
+                                         'variantId',
+                                         Variant::find()->where(['productId' => $id])->select(['commerce_variants.id']),
+                                     ])
                                      ->all();
 
         return $results;
+    }
 
-//        return array_map(function (&$record) {
-//            $subscription = new Subscription($record);
-//            $subscription->user = Craft::$app->users->getUserById($record->userId);
-//            $subscription->variant = Commerce::getInstance()->variants->getVariantById($record->variantId);
-//            return $subscription;
-//        }, $results);
+    public function getSubscriptionsCount(): int
+    {
+        return SubscriptionElement::find()->count();
+    }
+
+    public function getSubscriptionsCountForVariant($id): int
+    {
+        return SubscriptionElement::find()->where(['variantId' => $id])->count();
     }
 
     public function getSubscriptionsForVariant($id)
     {
-        return SubscriptionRecord::find()
+        return SubscriptionElement::find()
                                  ->where(['variantId' => $id])
                                  ->all();
     }

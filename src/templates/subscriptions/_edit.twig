@@ -15,7 +15,7 @@
     {{ actionInput('back-in-stock/subscriptions/save') }}
 
     {# Have the save action redirect to /back-in-stock afterward #}
-    {{ redirectInput('back-in-stock') }}
+    {{ redirectInput('back-in-stock/subscriptions/index') }}
 
     {{ forms.elementSelectField({
         label: 'Customer'|t('back-in-stock'),

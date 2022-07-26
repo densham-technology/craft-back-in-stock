@@ -1,9 +1,0 @@
-{% extends '_layouts/elementindex' %}
-{% set title = 'Subscriptions' %}
-{% set elementType = 'denshamtechnology\\backinstock\\elements\\Subscription' %}
-{% block toolbar %}
-    {% include '_elements/toolbar' with {
-        showSiteMenu: false,
-    } %}
-    <a class="btn submit icon add" href="{{ cpUrl('back-in-stock/subscriptions/new') }}">{{ "New subscription"|t('back-in-stock') }}</a>
-{% endblock %}
