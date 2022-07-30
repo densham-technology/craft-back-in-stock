@@ -8,21 +8,33 @@ use craft\helpers\Db;
 
 class SubscriptionQuery extends ElementQuery
 {
-    public $amount;
+    public $quantity;
     public $variantId;
+    public $isActive;
+    public $isArchived;
     public $hasProduct;
 
-    public function amount($value)
+    public function quantity($value)
     {
-        $this->amount = $value;
-
+        $this->quantity = $value;
         return $this;
     }
 
     public function variantId($value)
     {
         $this->variantId = $value;
+        return $this;
+    }
 
+    public function isActive($value)
+    {
+        $this->isActive = $value;
+        return $this;
+    }
+
+    public function isArchived($value)
+    {
+        $this->isArchived = $value;
         return $this;
     }
 
@@ -37,20 +49,29 @@ class SubscriptionQuery extends ElementQuery
         // join in the backinstock_subscriptions table
         $this->joinElementTable('backinstock_subscriptions');
 
-        // select the amount and currency columns
+        // select the quantity and currency columns
         $this->query->select([
             'backinstock_subscriptions.userId',
             'backinstock_subscriptions.variantId',
-            'backinstock_subscriptions.amount',
+            'backinstock_subscriptions.quantity',
             'backinstock_subscriptions.dateCreated',
+            'backinstock_subscriptions.dateArchived',
         ]);
 
-        if ($this->amount) {
-            $this->subQuery->andWhere(Db::parseParam('backinstock_subscriptions.amount', $this->amount));
+        if ($this->quantity) {
+            $this->subQuery->andWhere(Db::parseParam('backinstock_subscriptions.quantity', $this->quantity));
         }
 
         if ($this->variantId) {
             $this->subQuery->andWhere(Db::parseParam('backinstock_subscriptions.variantId', $this->variantId));
+        }
+
+        if ($this->isActive) {
+            $this->subQuery->andWhere(['dateArchived' => null]);
+        }
+
+        if ($this->isArchived) {
+            $this->subQuery->andWhere(['not', ['dateArchived' => null]]);
         }
 
         $this->applyHasProductParam();

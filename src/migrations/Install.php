@@ -106,9 +106,10 @@ class Install extends Migration
                     'id' => $this->integer()->notNull(),
                     'userId' => $this->integer()->notNull(),
                     'variantId' => $this->integer()->notNull(),
-                    'amount' => $this->integer()->notNull(),
+                    'quantity' => $this->integer()->notNull(),
                     'dateCreated' => $this->dateTime()->notNull(),
                     'dateUpdated' => $this->dateTime()->notNull(),
+                    'dateArchived' => $this->dateTime(),
                     'uid' => $this->uid(),
                     'PRIMARY KEY(id)',
                 ]

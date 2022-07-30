@@ -52,7 +52,7 @@ class BackInStockVariantQueryBehaviour extends Behavior
     {
         if ($this->hasBackInStockSubscription !== null) {
             if ($this->hasBackInStockSubscription) {
-                $this->owner->subQuery->join('LEFT JOIN', 'craft_backinstock_subscriptions', 'craft_backinstock_subscriptions.variantId = commerce_variants.id');
+                $this->owner->subQuery->join('RIGHT JOIN', 'craft_backinstock_subscriptions', 'craft_backinstock_subscriptions.variantId = commerce_variants.id');
                 $this->owner->subQuery->andWhere('craft_backinstock_subscriptions.variantId IS NOT NULL');
             } else {
                 //

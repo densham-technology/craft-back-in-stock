@@ -42,10 +42,10 @@
     {{ forms.textField({
         label: 'Quantity'|t('back-in-stock'),
         instructions: 'Enter quantity requested'|t('back-in-stock'),
-        id: '`amount`',
-        name: 'amount',
-        value: subscription.amount,
+        id: '`quantity`',
+        name: 'quantity',
+        value: subscription.quantity,
         required: true,
-        errors: subscription.getErrors('amount'),
+        errors: subscription.getErrors('quantity'),
     }) }}
 {% endblock %}

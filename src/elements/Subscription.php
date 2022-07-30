@@ -8,7 +8,7 @@ use craft\elements\actions\Delete;
 use craft\elements\actions\Edit;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
-use denshamtechnology\backinstock\elements\actions\ResolveSubscription;
+use denshamtechnology\backinstock\elements\actions\ArchiveSubscription;
 use denshamtechnology\backinstock\elements\db\SubscriptionQuery;
 
 /**
@@ -17,6 +17,9 @@ use denshamtechnology\backinstock\elements\db\SubscriptionQuery;
  */
 class Subscription extends Element
 {
+    const STATUS_ACTIVE = 'active';
+    const STATUS_ARCHIVED = 'archived';
+
     /**
      * @var int Variant ID
      */
@@ -28,14 +31,19 @@ class Subscription extends Element
     public $userId;
 
     /**
-     * @var int Amount
+     * @var int Quantity
      */
-    public $amount = 0;
+    public $quantity = 0;
 
     /**
      * @var \DateTime Date Created
      */
     public $dateCreated;
+
+    /**
+     * @var \DateTime Date Archived
+     */
+    public $dateArchived;
 
     /**
      * @var \craft\commerce\elements\Variant Variant
@@ -61,6 +69,34 @@ class Subscription extends Element
     public static function pluralDisplayName(): string
     {
         return 'Subscriptions';
+    }
+
+    public static function hasStatuses(): bool
+    {
+        return true;
+    }
+
+    public static function statuses(): array
+    {
+        return [
+            self::STATUS_ACTIVE   => [
+                'label' => Craft::t('back-in-stock', 'Active'),
+                'color' => 'green',
+            ],
+            self::STATUS_ARCHIVED => [
+                'label' => Craft::t('back-in-stock', 'Archived'),
+                'color' => 'grey',
+            ],
+        ];
+    }
+
+    public function getStatus()
+    {
+        if ($this->dateArchived !== null) {
+            return self::STATUS_ARCHIVED;
+        }
+
+        return self::STATUS_ACTIVE;
     }
 
     public function getUser()
@@ -127,7 +163,7 @@ class Subscription extends Element
     protected static function defineActions(string $source = null): array
     {
         return [
-            ResolveSubscription::class,
+            ArchiveSubscription::class,
             Edit::class,
             Delete::class,
         ];
@@ -148,41 +184,43 @@ class Subscription extends Element
         $user = $this->getUser();
         $variant = $this->getVariant();
 
-        $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'elementSelectField', [
+        $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'elementSelectField',
             [
-                'label' => Craft::t('back-in-stock', 'Customer'),
-                'id' => 'user',
-                'name' => 'user',
-                'elementType' => 'craft\\elements\\User',
-                'selectionLabel' => Craft::t('back-in-stock', 'Choose'),
-                'limit' => 1,
-                'elements' => $user ? [$user] : null,
-                'required' => true,
-            ],
-        ]);
+                [
+                    'label'          => Craft::t('back-in-stock', 'Customer'),
+                    'id'             => 'user',
+                    'name'           => 'user',
+                    'elementType'    => 'craft\\elements\\User',
+                    'selectionLabel' => Craft::t('back-in-stock', 'Choose'),
+                    'limit'          => 1,
+                    'elements'       => $user ? [$user] : null,
+                    'required'       => true,
+                ],
+            ]);
 
-        $html .= Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'elementSelectField', [
-            [
-                'label' => Craft::t('back-in-stock', 'Product'),
-                'id' => 'variant',
-                'name' => 'variant',
-                'elementType' => 'craft\\commerce\\elements\\Variant',
-                'selectionLabel' => Craft::t('back-in-stock', 'Choose'),
-                'limit' => 1,
-                'elements' => $variant ? [$variant] : null,
-                'required' => true,
-            ],
-        ]);
+        $html .= Craft::$app->getView()->renderTemplateMacro('_includes/forms',
+            'elementSelectField', [
+                [
+                    'label'          => Craft::t('back-in-stock', 'Product'),
+                    'id'             => 'variant',
+                    'name'           => 'variant',
+                    'elementType'    => 'craft\\commerce\\elements\\Variant',
+                    'selectionLabel' => Craft::t('back-in-stock', 'Choose'),
+                    'limit'          => 1,
+                    'elements'       => $variant ? [$variant] : null,
+                    'required'       => true,
+                ],
+            ]);
 
         $html .= Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'textField', [
             [
-                'label' => Craft::t('back-in-stock', 'Quantity'),
+                'label'        => Craft::t('back-in-stock', 'Quantity'),
                 'instructions' => Craft::t('back-in-stock', 'Enter quantity requested'),
-                'id' => 'amount',
-                'name' => 'amount',
-                'value' => $this->amount,
-                'required' => true,
-                'errors' => $this->getErrors('amount')
+                'id'           => 'quantity',
+                'name'         => 'quantity',
+                'value'        => $this->quantity,
+                'required'     => true,
+                'errors'       => $this->getErrors('quantity'),
             ],
         ]);
 
@@ -196,18 +234,20 @@ class Subscription extends Element
         if ($isNew) {
             Craft::$app->db->createCommand()
                            ->insert('{{%backinstock_subscriptions}}', [
-                               'id'        => $this->id,
-                               'userId'    => $this->userId,
-                               'variantId' => $this->variantId,
-                               'amount'    => $this->amount,
+                               'id'           => $this->id,
+                               'userId'       => $this->userId,
+                               'variantId'    => $this->variantId,
+                               'quantity'     => $this->quantity,
+                               'dateArchived' => $this->dateArchived,
                            ])
                            ->execute();
         } else {
             Craft::$app->db->createCommand()
                            ->update('{{%backinstock_subscriptions}}', [
-                               'userId'    => $this->userId,
-                               'variantId' => $this->variantId,
-                               'amount'    => $this->amount,
+                               'userId'       => $this->userId,
+                               'variantId'    => $this->variantId,
+                               'quantity'     => $this->quantity,
+                               'dateArchived' => $this->dateArchived,
                            ], ['id' => $this->id])
                            ->execute();
         }
@@ -228,13 +268,36 @@ class Subscription extends Element
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function datetimeAttributes(): array
+    {
+        $attributes = parent::datetimeAttributes();
+        $attributes[] = 'dateArchived';
+        return $attributes;
+    }
+
     protected static function defineSources(string $context = null): array
     {
         return [
             [
                 'key'      => '*',
-                'label'    => 'All Subscriptions',
+                'label'    => Craft::t('back-in-stock', 'All Subscriptions'),
                 'criteria' => [],
+            ],
+            ['heading' => Craft::t('back-in-stock', 'Subscription Status')],
+            [
+                'key'      => 'active',
+                'status'   => 'green',
+                'label'    => Craft::t('back-in-stock', 'Active Subscriptions'),
+                'criteria' => ['isActive' => true],
+            ],
+            [
+                'key'      => 'archived',
+                'status'   => 'grey',
+                'label'    => Craft::t('back-in-stock', 'Archived Subscriptions'),
+                'criteria' => ['isArchived' => true],
             ],
         ];
     }
@@ -245,7 +308,7 @@ class Subscription extends Element
             'subscription' => Craft::t('back-in-stock', 'Subscription'),
             'user'         => Craft::t('back-in-stock', 'Customer'),
             'variant'      => Craft::t('back-in-stock', 'Product'),
-            'amount'       => Craft::t('back-in-stock', 'Quantity'),
+            'quantity'     => Craft::t('back-in-stock', 'Quantity'),
             'dateCreated'  => Craft::t('back-in-stock', 'Date Subscribed'),
         ];
     }
@@ -257,8 +320,8 @@ class Subscription extends Element
     {
         return [
             [
-                'label' => Craft::t('back-in-stock', 'Date Subscribed'),
-                'orderBy' => 'dateCreated',
+                'label'      => Craft::t('back-in-stock', 'Date Subscribed'),
+                'orderBy'    => 'dateCreated',
                 'defaultDir' => 'desc',
             ],
         ];

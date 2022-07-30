@@ -67,7 +67,7 @@ class SubscriptionsController extends Controller
         }
 
         // Set the main properties from POST data
-        $subscription->amount = $this->request->getBodyParam('amount');
+        $subscription->quantity = $this->request->getBodyParam('quantity');
         $subscription->userId = $this->request->getBodyParam('user')[0];
         $subscription->variantId = $this->request->getBodyParam('variant')[0];
 
