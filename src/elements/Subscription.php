@@ -9,6 +9,7 @@ use craft\elements\actions\Edit;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use denshamtechnology\backinstock\elements\actions\ArchiveSubscription;
+use denshamtechnology\backinstock\elements\actions\SendEmail;
 use denshamtechnology\backinstock\elements\db\SubscriptionQuery;
 
 /**
@@ -163,6 +164,7 @@ class Subscription extends Element
     protected static function defineActions(string $source = null): array
     {
         return [
+            SendEmail::class,
             ArchiveSubscription::class,
             Edit::class,
             Delete::class,

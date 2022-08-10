@@ -78,4 +78,14 @@ class Subscriptions extends Component
     {
         return SubscriptionElement::find()->where(['backinstock_subscriptions.id' => $id])->one();
     }
+
+    public function getSubscriptionsForVariantAndUser($variantId, $userId)
+    {
+        return SubscriptionElement::find()
+            ->where([
+                'variantId' => $variantId,
+                'userId' => $userId,
+            ])
+            ->all();
+    }
 }

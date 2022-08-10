@@ -17,7 +17,7 @@
     "authors": [
         {
             "name": "Tom Densham",
-            "homepage": "https://github.com/densham-technology"
+            "homepage": "https://densham.technology"
         }
     ],
     "require": {
@@ -36,10 +36,10 @@
     "extra": {
         "name": "Back in stock",
         "handle": "back-in-stock",
-        "developer": "Tom Densham",
-        "developerUrl": "https://github.com/densham-technology",
-        "documentationUrl": "???",
-        "changelogUrl": "???",
+        "developer": "Densham Technology",
+        "developerUrl": "https://densham.technology",
+        "documentationUrl": "https://github.com/densham-technology/craft-back-in-stock/wiki",
+        "changelogUrl": "https://github.com/densham-technology/craft-back-in-stock/CHANGELOG.md",
         "components": {
             "subscriptions": "denshamtechnology\\backinstock\\services\\Subscriptions"
         },

@@ -96,4 +96,61 @@ class SubscriptionsController extends Controller
 
         return $this->redirectToPostedUrl($subscription);
     }
+
+    /**
+     * @return \yii\web\Response|null
+     * @throws \Throwable
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\web\BadRequestHttpException
+     */
+    public function actionAdd(): ?Response
+    {
+        // Create a new subscription element
+        $subscription = new Subscription();
+
+        // Set the main properties from POST data
+        $subscription->quantity = $this->request->getBodyParam('quantity');
+        $subscription->variantId = $this->request->getBodyParam('variantId');
+
+        $subscription->userId = Craft::$app->getUser()->id;
+
+        // Save the subscription
+        $success = Craft::$app->elements->saveElement($subscription);
+
+        if (!$success) {
+            $this->setFailFlash(Craft::t('back-in-stock', 'Couldn’t save subscription.'));
+
+            // Send the subscription back to the edit action
+            Craft::$app->urlManager->setRouteParams([
+                'subscription' => $subscription,
+            ]);
+
+            return null;
+        }
+
+        if ($this->request->acceptsJson) {
+            return $this->asJson([
+                'success' => true,
+                'subscription' => $subscription,
+            ]);
+        }
+
+        $this->setSuccessFlash(Craft::t('back-in-stock', 'Subscription saved.'));
+
+        return $this->redirectToPostedUrl($subscription);
+    }
+
+    public function actionList($variantId): ?Response
+    {
+        $subscriptions = BackInStock::$plugin->subscriptions->getSubscriptionsForVariantAndUser(
+            $variantId,
+            Craft::$app->getUser()->id,
+        );
+
+        return $this->asJson([
+            'success' => true,
+            'subscriptions' => $subscriptions,
+        ]);
+    }
 }

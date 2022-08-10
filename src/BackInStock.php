@@ -1,12 +1,4 @@
 <?php
-/**
- * craft-back-in-stock plugin for Craft CMS 3.x
- *
- * Plugin giving customers the ability to add their email to a list which will allow them to be notified when a product that is out of stock is restocked.
- *
- * @link      https://github.com/densham-technology
- * @copyright Copyright (c) 2022 Tom Densham
- */
 
 namespace denshamtechnology\backinstock;
 
@@ -119,6 +111,14 @@ class BackInStock extends Plugin
                 $event->rules['back-in-stock/subscriptions/product/<variantId:\d+>'] = 'back-in-stock/subscriptions/index';
                 $event->rules['back-in-stock/subscriptions/new'] = 'back-in-stock/subscriptions/edit';
                 $event->rules['back-in-stock/subscriptions/<subscriptionId:\d+>'] = 'back-in-stock/subscriptions/edit';
+            }
+        );
+
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_SITE_URL_RULES,
+            function (RegisterUrlRulesEvent $event) {
+                $event->rules['back-in-stock/subscriptions/list/<variantId:\d+>'] = 'back-in-stock/subscriptions/list';
             }
         );
 
