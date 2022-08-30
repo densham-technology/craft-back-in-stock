@@ -19,7 +19,7 @@ class SendEmail extends ElementAction
      */
     public function performAction(ElementQueryInterface $query): bool
     {
-        $subscriptions = $query->select('id')->all();
+        $subscriptions = $query->select('backinstock_subscriptions.id')->all();
 
         foreach ($subscriptions as $subscription) {
             /** @var Subscription $subscription */

@@ -8,6 +8,7 @@ use craft\elements\actions\Delete;
 use craft\elements\actions\Edit;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
+use craft\helpers\Template;
 use denshamtechnology\backinstock\elements\actions\ArchiveSubscription;
 use denshamtechnology\backinstock\elements\actions\SendEmail;
 use denshamtechnology\backinstock\elements\db\SubscriptionQuery;
@@ -260,19 +261,6 @@ class Subscription extends Element
     /**
      * @inheritdoc
      */
-    public function getSearchKeywords(string $attribute): string
-    {
-        switch ($attribute) {
-            case 'variant':
-                return $this->getVariant()->title;
-            default:
-                return '';
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function datetimeAttributes(): array
     {
         $attributes = parent::datetimeAttributes();
@@ -283,12 +271,6 @@ class Subscription extends Element
     protected static function defineSources(string $context = null): array
     {
         return [
-            [
-                'key'      => '*',
-                'label'    => Craft::t('back-in-stock', 'All Subscriptions'),
-                'criteria' => [],
-            ],
-            ['heading' => Craft::t('back-in-stock', 'Subscription Status')],
             [
                 'key'      => 'active',
                 'status'   => 'green',
@@ -304,6 +286,11 @@ class Subscription extends Element
         ];
     }
 
+    public function getLink(): string
+    {
+        return Template::raw("<a href='" . $this->getCpEditUrl() . "'>" . substr($this->uid, 0, 7) . '</a>');
+    }
+
     protected static function defineTableAttributes(): array
     {
         return [
@@ -312,6 +299,7 @@ class Subscription extends Element
             'variant'      => Craft::t('back-in-stock', 'Product'),
             'quantity'     => Craft::t('back-in-stock', 'Quantity'),
             'dateCreated'  => Craft::t('back-in-stock', 'Date Subscribed'),
+            'dateArchived' => Craft::t('back-in-stock', 'Date Archived'),
         ];
     }
 
@@ -324,6 +312,16 @@ class Subscription extends Element
             [
                 'label'      => Craft::t('back-in-stock', 'Date Subscribed'),
                 'orderBy'    => 'dateCreated',
+                'defaultDir' => 'asc',
+            ],
+            [
+                'label'      => Craft::t('back-in-stock', 'Date Archived'),
+                'orderBy'    => 'dateArchived',
+                'defaultDir' => 'asc',
+            ],
+            [
+                'label'      => Craft::t('back-in-stock', 'Quantity'),
+                'orderBy'    => 'quantity',
                 'defaultDir' => 'desc',
             ],
         ];
@@ -334,7 +332,28 @@ class Subscription extends Element
      */
     protected static function defineSearchableAttributes(): array
     {
-        return ['variant'];
+        return [
+            'email',
+            'variant',
+            'username',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchKeywords(string $attribute): string
+    {
+        switch ($attribute) {
+            case 'email':
+                return $this->getUser()->email ?? '';
+            case 'variant':
+                return $this->getVariant()->title ?? '';
+            case 'username':
+                return $this->getUser()->username ?? '';
+            default:
+                return parent::getSearchKeywords($attribute);
+        }
     }
 
     /**

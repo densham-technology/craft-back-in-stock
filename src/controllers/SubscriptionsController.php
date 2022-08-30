@@ -143,7 +143,7 @@ class SubscriptionsController extends Controller
 
     public function actionList($variantId): ?Response
     {
-        $subscriptions = BackInStock::$plugin->subscriptions->getSubscriptionsForVariantAndUser(
+        $subscriptions = BackInStock::$plugin->subscriptions->getActiveSubscriptionsForVariantAndUser(
             $variantId,
             Craft::$app->getUser()->id,
         );

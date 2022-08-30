@@ -12,7 +12,8 @@ class BackInStockVariantBehaviour extends Behavior
     public function hasBackInStockSubscription(): bool
     {
         return Subscription::find()
-            ->where(['variantId' => $this->owner->id])
+            ->variantId($this->owner->id)
+            ->isActive()
             ->exists();
     }
 }

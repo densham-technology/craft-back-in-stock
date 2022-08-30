@@ -12,35 +12,28 @@ class SubscriptionQuery extends ElementQuery
     public $variantId;
     public $isActive;
     public $isArchived;
-    public $hasProduct;
 
-    public function quantity($value)
+    public function quantity($value): self
     {
         $this->quantity = $value;
         return $this;
     }
 
-    public function variantId($value)
+    public function variantId($value): self
     {
         $this->variantId = $value;
         return $this;
     }
 
-    public function isActive($value)
+    public function isActive(bool $value = true): self
     {
         $this->isActive = $value;
         return $this;
     }
 
-    public function isArchived($value)
+    public function isArchived($value = true): self
     {
         $this->isArchived = $value;
-        return $this;
-    }
-
-    public function hasProduct($value)
-    {
-        $this->hasProduct = $value;
         return $this;
     }
 
@@ -59,51 +52,21 @@ class SubscriptionQuery extends ElementQuery
         ]);
 
         if ($this->quantity) {
-            $this->subQuery->andWhere(Db::parseParam('backinstock_subscriptions.quantity', $this->quantity));
+            $this->subQuery->andWhere(['backinstock_subscriptions.quantity' => $this->quantity]);
         }
 
         if ($this->variantId) {
-            $this->subQuery->andWhere(Db::parseParam('backinstock_subscriptions.variantId', $this->variantId));
+            $this->subQuery->andWhere(['backinstock_subscriptions.variantId' => $this->variantId]);
         }
 
         if ($this->isActive) {
-            $this->subQuery->andWhere(['dateArchived' => null]);
+            $this->subQuery->andWhere(['backinstock_subscriptions.dateArchived' => null]);
         }
 
         if ($this->isArchived) {
-            $this->subQuery->andWhere(['not', ['dateArchived' => null]]);
+            $this->subQuery->andWhere(['not', ['backinstock_subscriptions.dateArchived' => null]]);
         }
-
-        $this->applyHasProductParam();
 
         return parent::beforePrepare();
-    }
-
-    /**
-     * Applies the hasProduct query condition
-     */
-    private function applyHasProductParam()
-    {
-        if ($this->hasProduct === null) {
-            return;
-        }
-
-        if ($this->hasProduct instanceof ProductQuery) {
-            $productQuery = $this->hasProduct;
-        } elseif (is_array($this->hasProduct)) {
-            $query = Product::find();
-            $productQuery = Craft::configure($query, $this->hasProduct);
-        } else {
-            return;
-        }
-
-        $productQuery->limit = null;
-        $productQuery->select('commerce_products.id');
-        $productIds = $productQuery->column();
-
-        // Remove any blank product IDs (if any)
-        $productIds = array_filter($productIds);
-        $this->subQuery->leftJoin('craft_commerce_variants', 'craft_commerce_variants.id = backinstock_subscriptions.variantId');
-        $this->subQuery->andWhere(['craft_commerce_variants.productId' => $productIds]);
     }
 }

@@ -107,8 +107,8 @@ class BackInStock extends Plugin
             function (RegisterUrlRulesEvent $event) {
                 $event->rules['back-in-stock'] = ['template' => 'back-in-stock/variants/index'];
                 $event->rules['back-in-stock/products'] = ['template' => 'back-in-stock/variants/index'];
+                $event->rules['back-in-stock/products/<variantId:\d+>/subscriptions'] = 'back-in-stock/subscriptions/index';
                 $event->rules['back-in-stock/subscriptions'] = 'back-in-stock/subscriptions/index';
-                $event->rules['back-in-stock/subscriptions/product/<variantId:\d+>'] = 'back-in-stock/subscriptions/index';
                 $event->rules['back-in-stock/subscriptions/new'] = 'back-in-stock/subscriptions/edit';
                 $event->rules['back-in-stock/subscriptions/<subscriptionId:\d+>'] = 'back-in-stock/subscriptions/edit';
             }
@@ -186,7 +186,7 @@ class BackInStock extends Plugin
     public function getCpNavItem()
     {
         $item = parent::getCpNavItem();
-        $item['badgeCount'] = $this->subscriptions->getSubscriptionsCount();
+        $item['badgeCount'] = $this->subscriptions->getActiveSubscriptionsCount();
         $item['subnav'] = [
             'products' => ['label' => 'Products', 'url' => 'back-in-stock/products'],
             'subscriptions' => ['label' => 'Subscriptions', 'url' => 'back-in-stock/subscriptions'],

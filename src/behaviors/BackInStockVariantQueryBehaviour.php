@@ -2,7 +2,9 @@
 
 use craft\commerce\elements\db\VariantQuery;
 use craft\elements\db\ElementQuery;
+use craft\helpers\ArrayHelper;
 use yii\base\Behavior;
+use yii\db\Expression;
 
 class BackInStockVariantQueryBehaviour extends Behavior
 {
@@ -52,15 +54,32 @@ class BackInStockVariantQueryBehaviour extends Behavior
     {
         if ($this->hasBackInStockSubscription !== null) {
             if ($this->hasBackInStockSubscription) {
-                $this->owner->subQuery->join('RIGHT JOIN', 'craft_backinstock_subscriptions', 'craft_backinstock_subscriptions.variantId = commerce_variants.id');
-                $this->owner->subQuery->andWhere('craft_backinstock_subscriptions.variantId IS NOT NULL');
+                $this->owner->addSelect([
+                    'COUNT(subscriptions.id) AS subscribers',
+                    'SUM(subscriptions.quantity) AS quantity',
+                ]);
+                $this->owner->innerJoin('craft_backinstock_subscriptions subscriptions', 'subscriptions.variantId = commerce_variants.id');
+
+                $this->owner->subQuery->addSelect([
+                    'COUNT(subscriptions.id) AS subscribers',
+                    'SUM(subscriptions.quantity) AS quantity',
+                ]);
+                $this->owner->subQuery->andWhere('subscriptions.variantId IS NOT NULL');
+                $this->owner->subQuery->andWhere('subscriptions.dateArchived IS NULL');
+                $this->owner->subQuery->groupBy(['subscriptions.variantId', 'commerce_variants.id', 'elements_sites.id', 'content.id']);
+
+                if (ArrayHelper::firstValue($this->owner->select) !== 'COUNT(*)') {
+                    $this->owner->groupBy(['subscriptions.variantId', 'commerce_variants.id', 'elements_sites.id', 'content.id']);
+                } else {
+                    $this->owner->select = [new Expression('COUNT(DISTINCT(subscriptions.variantId))')];
+                }
             } else {
                 //
             }
         }
 
-        if ($this->distinct) {
-            $this->owner->subQuery->distinct();
-        }
+//        if ($this->distinct) {
+//            $this->owner->query->distinct();
+//        }
     }
 }

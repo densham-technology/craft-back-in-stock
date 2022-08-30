@@ -1,7 +1,7 @@
 {% extends "_layouts/elementindex" %}
 
 {% set title = "Products"|t('commerce') %}
-{% set docTitle = title~' - '~'Commerce' %}
+{% set docTitle = title~' - '~'Back in Stock' %}
 {% set elementType = 'denshamtechnology\\backinstock\\elements\\Variant' %}
 {% set selectedSubnavItem = "products" %}
 {% set bodyClass = (bodyClass is defined ? bodyClass~' ' : '') ~ "commerceproducts commerceproductsindex" %}
@@ -14,7 +14,6 @@
     storageKey: 'elementindex.{{ elementType|e("js") }}',
     criteria: {
         hasBackInStockSubscription: true,
-        distinct: true,
     },
     toolbarSelector: '#toolbar',
     canHaveDrafts: {{ (canHaveDrafts ?? false) ? 'true' : 'false' }},

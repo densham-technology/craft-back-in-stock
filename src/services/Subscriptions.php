@@ -57,14 +57,19 @@ class Subscriptions extends Component
         return $results;
     }
 
-    public function getSubscriptionsCount(): int
+    public function getActiveSubscriptionsCount(): int
     {
-        return SubscriptionElement::find()->count();
+        return SubscriptionElement::find()->isActive()->count();
     }
 
-    public function getSubscriptionsCountForVariant($id): int
+    public function getActiveSubscriptionsCountForVariant($id): int
     {
-        return SubscriptionElement::find()->where(['variantId' => $id])->count();
+        return SubscriptionElement::find()->isActive()->variantId($id)->count();
+    }
+
+    public function getActiveSubscriptionsRequestedStockForVariant($id): int
+    {
+        return SubscriptionElement::find()->isActive()->variantId($id)->sum('quantity');
     }
 
     public function getSubscriptionsForVariant($id)
@@ -79,9 +84,10 @@ class Subscriptions extends Component
         return SubscriptionElement::find()->where(['backinstock_subscriptions.id' => $id])->one();
     }
 
-    public function getSubscriptionsForVariantAndUser($variantId, $userId)
+    public function getActiveSubscriptionsForVariantAndUser($variantId, $userId)
     {
         return SubscriptionElement::find()
+            ->isActive()
             ->where([
                 'variantId' => $variantId,
                 'userId' => $userId,
