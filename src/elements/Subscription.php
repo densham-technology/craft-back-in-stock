@@ -11,6 +11,7 @@ use craft\elements\User;
 use craft\helpers\Template;
 use denshamtechnology\backinstock\elements\actions\ArchiveSubscription;
 use denshamtechnology\backinstock\elements\actions\SendEmail;
+use denshamtechnology\backinstock\elements\actions\UnarchiveSubscription;
 use denshamtechnology\backinstock\elements\db\SubscriptionQuery;
 
 /**
@@ -129,7 +130,7 @@ class Subscription extends Element
         $this->userId = $user->id;
     }
 
-    public function getVariant()
+    public function getVariant(): Variant
     {
         if ($this->_variant !== null && $this->_variant->id == $this->variantId) {
             return $this->_variant;
@@ -164,12 +165,32 @@ class Subscription extends Element
 
     protected static function defineActions(string $source = null): array
     {
-        return [
-            SendEmail::class,
-            ArchiveSubscription::class,
+        $actions = [];
+
+        if ($source === 'active') {
+            $actions[] = [
+                'type'              => SendEmail::class,
+                'triggerLabel'      => Craft::t('back-in-stock', 'Send "back in stock" email'),
+                'emailSubject'      => 'Back in stock!',
+                'emailTemplatePath' => '_emails/shop/backInStock',
+            ];
+            $actions[] = [
+                'type'              => SendEmail::class,
+                'triggerLabel'      => Craft::t('back-in-stock', 'Send "not available now" email'),
+                'emailSubject'      => 'Sorry we can\'t get this right now',
+                'emailTemplatePath' => '_emails/shop/notAvailableNow',
+            ];
+            $actions[] = ArchiveSubscription::class;
+        }
+
+        if ($source === 'archived') {
+            $actions[] = UnarchiveSubscription::class;
+        }
+
+        return array_merge($actions, [
             Edit::class,
             Delete::class,
-        ];
+        ]);
     }
 
     public function getCpEditUrl()

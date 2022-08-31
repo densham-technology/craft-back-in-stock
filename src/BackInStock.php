@@ -4,16 +4,19 @@ namespace denshamtechnology\backinstock;
 
 use craft\commerce\elements\db\VariantQuery;
 use craft\commerce\elements\Variant;
+use craft\commerce\Plugin as CommercePlugin;
 use craft\events\DefineBehaviorsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\services\Elements;
 use craft\services\Fields;
+use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use denshamtechnology\backinstock\behaviors\BackInStockVariantBehaviour;
 use denshamtechnology\backinstock\behaviors\BackInStockVariantQueryBehaviour;
 use denshamtechnology\backinstock\elements\Subscription;
 use denshamtechnology\backinstock\fields\SubscriptionsField;
+use denshamtechnology\backinstock\models\Settings;
 use denshamtechnology\backinstock\services\Subscriptions;
 
 use Craft;
@@ -65,7 +68,7 @@ class BackInStock extends Plugin
      *
      * @var bool
      */
-    public $hasCpSettings = false;
+    public $hasCpSettings = true;
 
     /**
      * Set to `true` if the plugin should have its own section (main nav item) in the control panel.
@@ -118,6 +121,7 @@ class BackInStock extends Plugin
             UrlManager::class,
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
+                $event->rules['back-in-stock/subscriptions/list'] = 'back-in-stock/subscriptions/list';
                 $event->rules['back-in-stock/subscriptions/list/<variantId:\d+>'] = 'back-in-stock/subscriptions/list';
             }
         );
@@ -196,4 +200,27 @@ class BackInStock extends Plugin
 
     // Protected Methods
     // =========================================================================
+
+    protected function createSettingsModel()
+    {
+        return new Settings();
+    }
+
+    protected function settingsHtml()
+    {
+        $commerceEmails = array_map(function ($email) {
+            return [
+                'label' => $email->name,
+                'value' => $email->uid
+            ];
+        }, CommercePlugin::getInstance()->getEmails()->getAllEmails());
+
+        return Craft::$app->getView()->renderTemplate(
+            'back-in-stock/settings',
+            [
+                'settings'       => $this->getSettings(),
+                'commerceEmails' => $commerceEmails,
+            ],
+        );
+    }
 }

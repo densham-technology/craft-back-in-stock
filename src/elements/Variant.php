@@ -61,19 +61,16 @@ class Variant extends BaseVariant
         return $attributes;
     }
 
-//    protected function tableAttributeHtml(string $attribute): string
-//    {
-//        switch ($attribute) {
-//            case 'requestedStock':
-//                return BackInStock::$plugin->subscriptions->getActiveSubscriptionsRequestedStockForVariant($this->id);
-//            case 'subscribers':
-//                $subscribers = BackInStock::$plugin->subscriptions->getActiveSubscriptionsCountForVariant($this->id);
-//                $url = UrlHelper::cpUrl("back-in-stock/products/$this->id/subscriptions");
-//                return '<span><a href="' . $url . '">' . $subscribers . '</a></span>';
-//            default:
-//                return parent::tableAttributeHtml($attribute);
-//        }
-//    }
+    protected function tableAttributeHtml(string $attribute): string
+    {
+        switch ($attribute) {
+            case 'subscribers':
+                $url = UrlHelper::cpUrl("back-in-stock/products/$this->id/subscriptions");
+                return '<span><a href="' . $url . '">' . $this->subscribers . '</a></span>';
+            default:
+                return parent::tableAttributeHtml($attribute);
+        }
+    }
 
     /**
      * @throws \yii\base\InvalidConfigException

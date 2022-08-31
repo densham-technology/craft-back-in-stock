@@ -141,15 +141,97 @@ class SubscriptionsController extends Controller
         return $this->redirectToPostedUrl($subscription);
     }
 
-    public function actionList($variantId): ?Response
+    /**
+     * @throws \yii\web\BadRequestHttpException
+     */
+    public function actionList($variantId = null): ?Response
     {
-        $subscriptions = BackInStock::$plugin->subscriptions->getActiveSubscriptionsForVariantAndUser(
-            $variantId,
+        $this->requireAcceptsJson();
+        $this->requireLogin();
+
+        $subscriptions = BackInStock::$plugin->subscriptions->getActiveSubscriptionsForUser(
             Craft::$app->getUser()->id,
+            $variantId,
         );
 
         return $this->asJson([
             'success' => true,
+            'subscriptions' => $subscriptions,
+        ]);
+    }
+
+    /**
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\web\BadRequestHttpException|\Throwable
+     */
+    public function actionUpdate(): ?Response
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+        $this->requireLogin();
+
+        $subscriptionId = $this->request->getBodyParam('subscriptionId');
+
+        $subscription = BackInStock::$plugin->subscriptions->getUserSubscriptionById($subscriptionId);
+
+        if (!$subscription) {
+            throw new BadRequestHttpException("Invalid subscription ID: $subscriptionId");
+        }
+
+        $subscription->quantity = $this->request->getBodyParam('quantity');
+
+        $success = Craft::$app->elements->saveElement($subscription);
+
+        $subscriptions = BackInStock::$plugin->subscriptions->getActiveSubscriptionsForUser(
+            Craft::$app->getUser()->id,
+        );
+
+        if (!$success) {
+            return $this->asJson([
+                'error'         => 'Couldn’t update subscription.',
+                'subscriptions' => $subscriptions,
+            ]);
+        }
+
+        return $this->asJson([
+            'success'       => true,
+            'subscriptions' => $subscriptions,
+        ]);
+    }
+
+    /**
+     * @throws \yii\web\BadRequestHttpException|\Throwable
+     */
+    public function actionDelete(): ?Response
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+        $this->requireLogin();
+
+        $subscriptionId = $this->request->getBodyParam('subscriptionId');
+
+        $subscription = BackInStock::$plugin->subscriptions->getUserSubscriptionById($subscriptionId);
+
+        if (!$subscription) {
+            throw new BadRequestHttpException("Invalid subscription ID: $subscriptionId");
+        }
+
+        $success = Craft::$app->getElements()->deleteElement($subscription);
+
+        $subscriptions = BackInStock::$plugin->subscriptions->getActiveSubscriptionsForUser(
+            Craft::$app->getUser()->id,
+        );
+
+        if (!$success) {
+            return $this->asJson([
+                'error'         => 'Couldn’t delete subscription.',
+                'subscriptions' => $subscriptions,
+            ]);
+        }
+
+        return $this->asJson([
+            'success'       => true,
             'subscriptions' => $subscriptions,
         ]);
     }

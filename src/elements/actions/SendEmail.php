@@ -9,9 +9,15 @@ use denshamtechnology\backinstock\jobs\SendBackInStockMessage;
 
 class SendEmail extends ElementAction
 {
-    public static function displayName(): string
+    public $triggerLabel;
+
+    public $emailSubject;
+
+    public $emailTemplatePath;
+
+    public function getTriggerLabel(): string
     {
-        return Craft::t('back-in-stock', 'Send email');
+        return $this->triggerLabel ?? Craft::t('back-in-stock', 'Send email');
     }
 
     /**
@@ -24,7 +30,9 @@ class SendEmail extends ElementAction
         foreach ($subscriptions as $subscription) {
             /** @var Subscription $subscription */
             Queue::push(new SendBackInStockMessage([
-                'subscriptionId' => $subscription->id,
+                'subscriptionId'    => $subscription->id,
+                'emailSubject'      => $this->emailSubject,
+                'emailTemplatePath' => $this->emailTemplatePath,
             ]));
         }
 

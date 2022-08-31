@@ -15,6 +15,7 @@ use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Variant;
 use denshamtechnology\backinstock\elements\Subscription as SubscriptionElement;
+use denshamtechnology\backinstock\models\Subscription;
 
 /**
  * CraftbackinstockService Service
@@ -47,12 +48,12 @@ class Subscriptions extends Component
     public function getSubscriptionsForProduct($id)
     {
         $results = SubscriptionElement::find()
-                                     ->where([
-                                         'in',
-                                         'variantId',
-                                         Variant::find()->where(['productId' => $id])->select(['commerce_variants.id']),
-                                     ])
-                                     ->all();
+                                      ->where([
+                                          'in',
+                                          'variantId',
+                                          Variant::find()->where(['productId' => $id])->select(['commerce_variants.id']),
+                                      ])
+                                      ->all();
 
         return $results;
     }
@@ -75,8 +76,8 @@ class Subscriptions extends Component
     public function getSubscriptionsForVariant($id)
     {
         return SubscriptionElement::find()
-                                 ->where(['variantId' => $id])
-                                 ->all();
+                                  ->where(['variantId' => $id])
+                                  ->all();
     }
 
     public function getSubscriptionById($id)
@@ -84,14 +85,68 @@ class Subscriptions extends Component
         return SubscriptionElement::find()->where(['backinstock_subscriptions.id' => $id])->one();
     }
 
-    public function getActiveSubscriptionsForVariantAndUser($variantId, $userId)
+    public function getUserSubscriptionById($id)
     {
+        $userId = Craft::$app->getUser()->id;
+
         return SubscriptionElement::find()
-            ->isActive()
-            ->where([
-                'variantId' => $variantId,
-                'userId' => $userId,
-            ])
-            ->all();
+                                  ->where([
+                                      'backinstock_subscriptions.id'     => $id,
+                                      'backinstock_subscriptions.userId' => $userId,
+                                  ])
+                                  ->one();
+    }
+
+    public function getActiveSubscriptionsForUser($userId, $variantId = null): array
+    {
+        $subscriptions = SubscriptionElement::find()
+                                            ->isActive()
+                                            ->filterWhere([
+                                                'variantId' => $variantId,
+                                                'userId'    => $userId,
+                                            ])
+                                            ->all();
+
+        return $this->toRecords($subscriptions);
+    }
+
+    public function getUserSubscriptions()
+    {
+        $userId = Craft::$app->getUser()->id;
+
+        $subscriptions = SubscriptionElement::find()->where(['userId' => $userId])->all();
+
+        return $this->toRecords($subscriptions);
+    }
+
+    public function updateUserSubscription($id, $quantity): ?Subscription
+    {
+
+    }
+
+    /**
+     * @param array $subscriptions
+     *
+     * @return \denshamtechnology\backinstock\models\Subscription[]
+     * @throws \yii\base\InvalidConfigException
+     */
+    private function toRecords(array $subscriptions): array
+    {
+        return array_map(function (SubscriptionElement $element) {
+            $variant = $element->getVariant();
+
+            // Eager load product
+            $variant->getProduct();
+
+            return new Subscription([
+                'id'           => $element->id,
+                'quantity'     => $element->quantity,
+                'variant'      => $variant,
+                'productType'  => $variant->getProduct()->getType()->handle,
+                'dateCreated'  => $element->dateCreated,
+                'dateUpdated'  => $element->dateUpdated,
+                'dateArchived' => $element->dateArchived,
+            ]);
+        }, $subscriptions);
     }
 }

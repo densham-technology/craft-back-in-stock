@@ -1,6 +1,8 @@
 <?php namespace denshamtechnology\backinstock\jobs;
 
 use Craft;
+use craft\commerce\Plugin as CommercePlugin;
+use craft\helpers\App;
 use craft\helpers\DateTimeHelper;
 use craft\mail\Message;
 use craft\queue\BaseJob;
@@ -10,6 +12,10 @@ use Throwable;
 
 class SendBackInStockMessage extends BaseJob
 {
+    public $emailSubject;
+
+    public $emailTemplatePath;
+
     public $subscriptionId;
 
     /**
@@ -24,14 +30,53 @@ class SendBackInStockMessage extends BaseJob
             return;
         }
 
+        // Set Craft to the site template mode
+        $view = Craft::$app->getView();
+        $oldTemplateMode = $view->getTemplateMode();
+        $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+        $generalConfig = Craft::$app->getConfig()->getGeneral();
+        // Temporarily disable lazy transform generation
+        $generateTransformsBeforePageLoad = $generalConfig->generateTransformsBeforePageLoad;
+        $generalConfig->generateTransformsBeforePageLoad = true;
+
+        $originalLanguage = Craft::$app->language;
+        $craftMailSettings = App::mailSettings();
+
         $message = new Message();
 
-        $message->setTo($subscription->user->email);
-        $message->setSubject('Back in stock!');
-        $message->setTextBody('Hello from the queue system! 👋');
+        $fromEmail = CommercePlugin::getInstance()->getSettings()->emailSenderAddress ?: $craftMailSettings->fromEmail;
+        $fromEmail = Craft::parseEnv($fromEmail);
+
+        $fromName = CommercePlugin::getInstance()->getSettings()->emailSenderName ?: $craftMailSettings->fromName;
+        $fromName = Craft::parseEnv($fromName);
+
+        if ($fromEmail) {
+            $message->setFrom($fromEmail);
+        }
+
+        if ($fromName && $fromEmail) {
+            $message->setFrom([$fromEmail => $fromName]);
+        }
+
+        if ($subscription->getUser()) {
+            $message->setTo($subscription->user->email);
+        }
+
+        $message->setSubject($this->emailSubject);
+
+        $body = $view->renderTemplate($this->emailTemplatePath, [
+            'subscription' => $subscription,
+        ]);
+
+        $message->setHtmlBody($body);
+
+        Craft::$app->language = $originalLanguage;
+        $view->setTemplateMode($oldTemplateMode);
+        $generalConfig->generateTransformsBeforePageLoad = $generateTransformsBeforePageLoad;
 
         try {
             Craft::$app->getMailer()->send($message);
+
             $subscription->dateArchived = DateTimeHelper::toIso8601(new DateTime('now'));
             Craft::$app->getElements()->saveElement($subscription);
         } catch (Throwable $exception) {
