@@ -130,7 +130,7 @@ class Subscription extends Element
         $this->userId = $user->id;
     }
 
-    public function getVariant(): Variant
+    public function getVariant(): ?Variant
     {
         if ($this->_variant !== null && $this->_variant->id == $this->variantId) {
             return $this->_variant;
