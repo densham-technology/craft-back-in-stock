@@ -1,4 +1,4 @@
-# craft-back-in-stock plugin for Craft CMS 3.x
+# Back in Stock plugin for Craft CMS 3.x
 
 Plugin giving customers the ability to add their email to a list which will allow them to be notified when a product that is out of stock is restocked.
 
@@ -6,7 +6,7 @@ Plugin giving customers the ability to add their email to a list which will allo
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 3.0.0 and Craft Commerce 3.0.0 or later.
 
 ## Installation
 
@@ -18,26 +18,8 @@ To install the plugin, follow these instructions.
 
 2. Then tell Composer to load the plugin:
 
-        composer require /craft-back-in-stock
+        composer require densham-technology/craft-back-in-stock
 
-3. In the Control Panel, go to Settings → Plugins and click the “Install” button for craft-back-in-stock.
+3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Back in stock.
 
-## craft-back-in-stock Overview
-
--Insert text here-
-
-## Configuring craft-back-in-stock
-
--Insert text here-
-
-## Using craft-back-in-stock
-
--Insert text here-
-
-## craft-back-in-stock Roadmap
-
-Some things to do, and ideas for potential features:
-
-* Release it
-
-Brought to you by [Tom Densham](https://github.com/densham-technology)
+Brought to you by [Densham Technology](https://github.com/densham-technology)

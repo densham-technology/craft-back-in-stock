@@ -11,17 +11,19 @@
         "craft-back-in-stock"
     ],
     "support": {
+        "docs": "https://github.com/densham-technology/craft-back-in-stock/blob/master/README.md",
         "issues": "https://github.com/densham-technology/craft-back-in-stock/issues"
     },
-    "license": "Commercial",
+    "license": "proprietary",
     "authors": [
         {
-            "name": "Tom Densham",
+            "name": "Densham Technology",
             "homepage": "https://densham.technology"
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0"
+        "craftcms/cms": "^3.0.0",
+        "craftcms/commerce": "^3.0.0"
     },
     "require-dev": {
       "craftcms/cms": "^3.2.0",
@@ -38,7 +40,7 @@
         "handle": "back-in-stock",
         "developer": "Densham Technology",
         "developerUrl": "https://densham.technology",
-        "documentationUrl": "https://github.com/densham-technology/craft-back-in-stock/wiki",
+        "documentationUrl": "https://github.com/densham-technology/craft-back-in-stock/blob/master/README.md",
         "changelogUrl": "https://github.com/densham-technology/craft-back-in-stock/CHANGELOG.md",
         "components": {
             "subscriptions": "denshamtechnology\\backinstock\\services\\Subscriptions"
