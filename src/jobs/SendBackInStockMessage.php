@@ -90,6 +90,6 @@ class SendBackInStockMessage extends BaseJob
      */
     protected function defaultDescription(): string
     {
-        return Craft::t('back-in-stock', 'Sending a worthless email');
+        return Craft::t('back-in-stock', 'Sending a back in stock email');
     }
 }

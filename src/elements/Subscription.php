@@ -171,13 +171,13 @@ class Subscription extends Element
             $actions[] = [
                 'type'              => SendEmail::class,
                 'triggerLabel'      => Craft::t('back-in-stock', 'Send "back in stock" email'),
-                'emailSubject'      => 'Back in stock!',
+                'emailSubject'      => 'Yay - the product you requested is now back in stock',
                 'emailTemplatePath' => '_emails/shop/backInStock',
             ];
             $actions[] = [
                 'type'              => SendEmail::class,
-                'triggerLabel'      => Craft::t('back-in-stock', 'Send "not available now" email'),
-                'emailSubject'      => 'Sorry we can\'t get this right now',
+                'triggerLabel'      => Craft::t('back-in-stock', 'Send "permanently out of stock" email'),
+                'emailSubject'      => 'Update - product now permanently out of stock',
                 'emailTemplatePath' => '_emails/shop/notAvailableNow',
             ];
             $actions[] = ArchiveSubscription::class;
