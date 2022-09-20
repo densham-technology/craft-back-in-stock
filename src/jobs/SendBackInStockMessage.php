@@ -3,7 +3,6 @@
 use Craft;
 use craft\commerce\Plugin as CommercePlugin;
 use craft\helpers\App;
-use craft\helpers\DateTimeHelper;
 use craft\mail\Message;
 use craft\queue\BaseJob;
 use DateTime;
@@ -77,7 +76,7 @@ class SendBackInStockMessage extends BaseJob
         try {
             Craft::$app->getMailer()->send($message);
 
-            $subscription->dateArchived = DateTimeHelper::toIso8601(new DateTime('now'));
+            $subscription->dateArchived = new DateTime('now');
             Craft::$app->getElements()->saveElement($subscription);
         } catch (Throwable $exception) {
             // Don’t let an exception block the queue
