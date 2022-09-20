@@ -8,6 +8,7 @@ use craft\elements\actions\Delete;
 use craft\elements\actions\Edit;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
+use craft\helpers\Db;
 use craft\helpers\Template;
 use denshamtechnology\backinstock\elements\actions\ArchiveSubscription;
 use denshamtechnology\backinstock\elements\actions\SendEmail;
@@ -262,7 +263,7 @@ class Subscription extends Element
                                'userId'       => $this->userId,
                                'variantId'    => $this->variantId,
                                'quantity'     => $this->quantity,
-                               'dateArchived' => $this->dateArchived,
+                               'dateArchived' => Db::prepareDateForDb($this->dateArchived),
                            ])
                            ->execute();
         } else {
@@ -271,7 +272,7 @@ class Subscription extends Element
                                'userId'       => $this->userId,
                                'variantId'    => $this->variantId,
                                'quantity'     => $this->quantity,
-                               'dateArchived' => $this->dateArchived,
+                               'dateArchived' => Db::prepareDateForDb($this->dateArchived),
                            ], ['id' => $this->id])
                            ->execute();
         }

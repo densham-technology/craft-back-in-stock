@@ -76,7 +76,7 @@ class SendBackInStockMessage extends BaseJob
         try {
             Craft::$app->getMailer()->send($message);
 
-            $subscription->dateArchived = new DateTime('now');
+            $subscription->dateArchived = new DateTime();
             Craft::$app->getElements()->saveElement($subscription);
         } catch (Throwable $exception) {
             // Don’t let an exception block the queue
