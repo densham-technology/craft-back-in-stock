@@ -138,11 +138,20 @@ class Subscriptions extends Component
             // Eager load product
             $variant->getProduct();
 
+            $productImage = false;
+
+            if ($variant->getProduct()->displayOptionsAsGrid) {
+                $productImage = $variant->coverImage->one();
+            } elseif ($variant->getProduct()->coverImage->exists()) {
+                $productImage = $variant->getProduct()->coverImage->one();
+            }
+
             return new Subscription([
                 'id'           => $element->id,
                 'quantity'     => $element->quantity,
                 'variant'      => $variant,
                 'productType'  => $variant->getProduct()->getType()->handle,
+                'productImage' => $productImage,
                 'dateCreated'  => $element->dateCreated,
                 'dateUpdated'  => $element->dateUpdated,
                 'dateArchived' => $element->dateArchived,

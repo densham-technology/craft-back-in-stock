@@ -1,6 +1,7 @@
 {% extends '_layouts/cp' %}
 {% import '_includes/forms' as forms %}
 
+{% set selectedSubnavItem = 'subscriptions' %}
 {% set title = 'Edit Subscription'|t('back-in-stock') %}
 {% set fullPageForm = true %}
 
@@ -48,4 +49,21 @@
         required: true,
         errors: subscription.getErrors('quantity'),
     }) }}
+{% endblock %}
+
+{% block details %}
+    <div class="meta">
+        {{ forms.dateTimeField({
+            label: "Date Created"|t('back-in-stock'),
+            id: 'dateCreated',
+            name: 'dateCreated',
+            value: subscription.dateCreated
+        }) }}
+        {{ forms.dateTimeField({
+            label: "Date Archived"|t('back-in-stock'),
+            id: 'dateArchived',
+            name: 'dateArchived',
+            value: subscription.dateArchived
+        }) }}
+    </div>
 {% endblock %}

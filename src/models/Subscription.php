@@ -8,6 +8,7 @@ class Subscription extends Model
     public $quantity;
     public $variant;
     public $productType;
+    public $productImage;
     public $dateCreated;
     public $dateUpdated;
     public $dateArchived;

@@ -2,7 +2,7 @@
     "name": "densham-technology/craft-back-in-stock",
     "description": "Plugin giving customers the ability to add their email to a list which will allow them to be notified when a product that is out of stock is restocked.",
     "type": "craft-plugin",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "keywords": [
         "craft",
         "cms",
