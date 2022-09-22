@@ -14,6 +14,7 @@ use denshamtechnology\backinstock\elements\actions\ArchiveSubscription;
 use denshamtechnology\backinstock\elements\actions\SendEmail;
 use denshamtechnology\backinstock\elements\actions\UnarchiveSubscription;
 use denshamtechnology\backinstock\elements\db\SubscriptionQuery;
+use denshamtechnology\backinstock\elements\Variant as BackInStockVariant;
 
 /**
  * @property \craft\commerce\elements\Variant $variant
@@ -277,7 +278,20 @@ class Subscription extends Element
                            ->execute();
         }
 
+        Craft::$app->elements->invalidateCachesForElementType(BackInStockVariant::class);
+
         parent::afterSave($isNew);
+    }
+
+    public function afterDelete()
+    {
+        Craft::$app->db->createCommand()
+                       ->delete('{{%backinstock_subscriptions}}', ['id' => $this->id])
+                       ->execute();
+
+        Craft::$app->elements->invalidateCachesForElementType(BackInStockVariant::class);
+
+        parent::afterDelete();
     }
 
     /**
