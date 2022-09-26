@@ -191,7 +191,10 @@ class Subscription extends Element
 
         return array_merge($actions, [
             Edit::class,
-            Delete::class,
+            [
+                'type' => Delete::class,
+                'hard' => true,
+            ],
         ]);
     }
 

@@ -61,6 +61,10 @@ class SendBackInStockMessage extends BaseJob
             $message->setTo($subscription->user->email);
         }
 
+        if (Craft::$app->config->env === 'production') {
+            $message->setBcc('info@guthrie-ghani.co.uk');
+        }
+
         $message->setSubject($this->emailSubject);
 
         $body = $view->renderTemplate($this->emailTemplatePath, [

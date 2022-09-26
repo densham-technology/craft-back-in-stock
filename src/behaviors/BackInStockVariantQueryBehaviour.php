@@ -55,8 +55,8 @@ class BackInStockVariantQueryBehaviour extends Behavior
         if ($this->hasBackInStockSubscription !== null) {
             if ($this->hasBackInStockSubscription) {
                 $this->owner->addSelect([
-                    'COUNT(subscriptions.id) AS subscribers',
-                    'SUM(subscriptions.quantity) AS quantity',
+                    'subquery.subscribers',
+                    'subquery.quantity',
                 ]);
                 $this->owner->innerJoin('craft_backinstock_subscriptions subscriptions', 'subscriptions.variantId = commerce_variants.id');
 
