@@ -53,7 +53,7 @@ class BackInStockVariantQueryBehaviour extends Behavior
     public function beforePrepare()
     {
         if ($this->hasBackInStockSubscription !== null) {
-            if ($this->hasBackInStockSubscription) {
+            if ($this->hasBackInStockSubscription && ($this->owner->join === null || !$this->owner->isJoined('craft_backinstock_subscriptions'))) {
                 $this->owner->addSelect([
                     'subquery.subscribers',
                     'subquery.quantity',
@@ -68,10 +68,12 @@ class BackInStockVariantQueryBehaviour extends Behavior
                 $this->owner->subQuery->andWhere('subscriptions.dateArchived IS NULL');
                 $this->owner->subQuery->groupBy(['subscriptions.variantId', 'commerce_variants.id', 'elements_sites.id', 'content.id']);
 
-                if (ArrayHelper::firstValue($this->owner->select) !== 'COUNT(*)') {
-                    $this->owner->groupBy(['subscriptions.variantId', 'commerce_variants.id', 'elements_sites.id', 'content.id']);
-                } else {
+                $firstSelectValue = ArrayHelper::firstValue($this->owner->select);
+
+                if ($firstSelectValue === 'COUNT(*)') {
                     $this->owner->select = [new Expression('COUNT(DISTINCT(subscriptions.variantId))')];
+                } else {
+                    $this->owner->groupBy(['subscriptions.variantId', 'commerce_variants.id', 'elements_sites.id', 'content.id']);
                 }
             } else {
                 //
