@@ -57,6 +57,7 @@ class Variant extends BaseVariant
         }
 
         $attributes[] = 'sku';
+        $attributes[] = 'supplier';
         $attributes[] = 'stock';
         $attributes[] = 'quantity';
         $attributes[] = 'subscribers';
