@@ -13,7 +13,7 @@ class Variant extends BaseVariant
     protected static function defineSearchableAttributes(): array
     {
         return array_merge(parent::defineSearchableAttributes(), [
-            'sku',
+            'supplier',
         ]);
     }
 
@@ -22,6 +22,8 @@ class Variant extends BaseVariant
         switch ($attribute) {
             case 'username':
                 return $this->getUser()->username ?? '';
+            case 'supplier':
+                return $this->vendProductSupplierName ?? '';
             default:
                 return parent::getSearchKeywords($attribute);
         }
@@ -40,6 +42,7 @@ class Variant extends BaseVariant
     protected static function defineTableAttributes(): array
     {
         return array_merge(parent::defineTableAttributes(), [
+            'supplier' => Craft::t('back-in-stock', 'Supplier'),
             'quantity' => Craft::t('back-in-stock', 'Requested Stock'),
             'subscribers' => Craft::t('back-in-stock', 'Subscribers'),
         ]);
@@ -64,6 +67,8 @@ class Variant extends BaseVariant
     protected function tableAttributeHtml(string $attribute): string
     {
         switch ($attribute) {
+            case 'supplier':
+                return $this->vendProductSupplierName ?? '';
             case 'subscribers':
                 $url = UrlHelper::cpUrl("back-in-stock/products/$this->id/subscriptions");
                 return '<span><a href="' . $url . '">' . $this->subscribers . '</a></span>';

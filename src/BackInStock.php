@@ -10,13 +10,10 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\services\Elements;
 use craft\services\Fields;
-use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use denshamtechnology\backinstock\behaviors\BackInStockVariantBehaviour;
 use denshamtechnology\backinstock\behaviors\BackInStockVariantQueryBehaviour;
 use denshamtechnology\backinstock\elements\Subscription;
-use denshamtechnology\backinstock\fields\SubscriptionsField;
-use denshamtechnology\backinstock\models\Settings;
 use denshamtechnology\backinstock\services\Subscriptions;
 
 use Craft;
@@ -136,19 +133,6 @@ class BackInStock extends Plugin
                 $event->sender->attachBehaviors([
                     BackInStockVariantQueryBehaviour::class,
                 ]);
-            }
-        );
-
-        // Register our Field
-        Event::on(
-            Fields::class,
-            Fields::EVENT_REGISTER_FIELD_TYPES,
-            function (RegisterComponentTypesEvent $event) {
-                Craft::debug(
-                    'Fields::EVENT_REGISTER_FIELD_TYPES',
-                    __METHOD__
-                );
-                $event->types[] = SubscriptionsField::class;
             }
         );
 
