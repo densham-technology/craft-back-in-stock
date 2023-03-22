@@ -424,5 +424,7 @@ class Subscription extends Element
         if ($this->getVariant()) {
             return '<span><a href="' . $this->getVariant()->getCpEditUrl() . '">' . $this->getVariant()->title . '</a></span>';
         }
+
+        return '';
     }
 }
